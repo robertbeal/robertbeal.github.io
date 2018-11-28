@@ -1,0 +1,121 @@
+---
+layout: post
+title: Decoupling your tests to improve code quality
+date: '2017-10-08T11:59:00.000+01:00'
+author: Rob
+tags:
+- code
+modified_time: '2017-10-08T11:59:00.000+01:00'
+---
+
+<p>Connascence is a quality metric for describing how coupled two systems are, or in the terms of this example, how coupled our implementation class and test class are. Because it describes levels of coupling (in a structured order, see below) we can use it to help prioritise what should be refactored first.</p>
+
+<img src="https://user-images.githubusercontent.com/296433/32545866-e76da88a-c474-11e7-83e7-9c5b642a70b8.png" alt="Connascence" width="389" height="342" />
+
+<p>As always there is a trade off in how far down the chart you work but from personal experience I usually find beyond Connascence of Meaning the value starts to drop off. I'll go over a simple example (so take it with a pinch of salt) that should show firstly, how to clean up your code, but also how you could end up with a better solution. Oh, and excuse my python (if it's not overly pythonic), I'm not a native python coder. In the below example I'll tackle two of the types of Connascence.</p>
+
+<h3>Fizz Buzz</h3>
+
+<p>A very typical kata most of you may have come across at some point in time. The requirements are very simple.</p>
+
+<ul>
+<li>You count in numbers, starting at 0, incremeting one at a time</li>
+<li>For numbers divisible by 3, you say "Fizz"</li>
+<li>For numbers divisible by 5, you say "Buzz"</li>
+<li>For numbers divisible by 3 or 5, you say the rules in their above order, ie "FizzBuzz"</li>
+<li>If the number does not match a rule, you say the number, ie "4"</li>
+</ul>
+
+<p>Easy! Right let's start test driving this...</p>
+
+{% highlight python %}
+class FizzBuzz(object):
+    def say(self, input):
+        if input % 3 == 0:
+            return "Fizz"
+        return input
+
+class TestFizzBuzz(unittest.TestCase):
+    def test_it_says_Fizz_for_numbers_divisible_by_3(self):
+        for i in range(1, 100):
+            value = i*3
+            self.assertEqual("Fizz", FizzBuzz().say(value))
+{% endhighlight %}
+
+<p>I've not gone overly purist, and I've jumped in at getting "Fizz" to work. A first test that passes as simply as I can make it. Many people may stop here and move on to coding "Buzz", but I'd like to first tackle some coupling. First up is <strong>Connascence of Value</strong> in that both my implementation and test share knowledge of "Fizz" and "3". I'll fix this first by injecting the values into my implementation so that my test can control the scenario:</p>
+
+{% highlight python %}
+class FizzBuzz(object):
+    def __init__(self, number, value):
+        self.number = number
+        self.value = value
+
+    def say(self, input):
+        if input % self.number == 0:
+            return self.value
+        return input
+
+class TestFizzBuzz(unittest.TestCase):
+    def test_it_says_if_divisible_by_a_specified_number(self):
+        number = randint(1, 9)
+        word = str(uuid.uuid4())
+        for i in range(1, 100):
+            value = i*number
+            self.assertEqual(word, FizzBuzz(number, word).say(value))
+{% endhighlight %}
+
+<p>In the above I've fixed <strong>Connascence of Value</strong>, and in doing so I'm able to randomise the number and word said (as it doesn't matter what they are). Contextually, if it can divide by the number, the word gets said.</p>
+
+
+<p>Luckily I've no <strong>Connascence of Timing</strong> (the timing of the execution of code doesn't impact me) or <strong>Connascence of Execution Order</strong> (nor does execution order of the implementation code affect me) and arguably no Connascence of Position.</p>
+
+<p>I am however breaking <strong>Connascence of Algorithm</strong> as both my implementation and test know that it's a multiple of a number. They are coupled by both having to know the same "algorithm", in this case a simple mod 0. So let's fix this, again by injecting in the "algorithm" so that the test controls the scenario...</p>
+
+{% highlight python %}
+class FizzBuzz(object):
+    def __init__(self, rule, value):
+        self.rule = rule
+        self.value = value
+
+    def say(self, input):
+        if self.rule(input):
+            return self.value
+        return input
+
+class TestFizzBuzz(unittest.TestCase):
+    def test_it_says_if_the_rule_applies(self):
+        word = str(uuid.uuid4())
+        self.assertEqual(word, FizzBuzz((lambda i: True), word).say(0))
+{% endhighlight %}
+
+<p>In removing the <strong>Connascence of Algorithm</strong> I'm able to competely change the context of my test. Instead of passing in a number I just need to pass in a lambda expression (which would be "lambda i: i % 3 == 0"). In the case of my test though, I don't care what the expression is, only that if it returns true, then FizzBuzz will say the word. I can also easily add a negative test case:</p>
+
+{% highlight python %}
+    def test_it_says_the_number_if_the_rule_does_not_apply(self):
+        word = str(uuid.uuid4())
+        self.assertEqual(0, FizzBuzz((lambda i: False), word).say(0))
+{% endhighlight %}
+
+<p>Next up I hit <strong>Connascence of Meaning</strong> (an example would be, returning an int to represent a monetary value. Is it pence? Pounds? Dollars? Cents? etc...). This basic kata isn't really affected by it, so I'll halt my refactoring there. In terms of testing "Buzz" I'm already covered by the above tests. The next step would be to test saying two rules, ie "FizzBuzz" at which point I'd fix only injecting a single rule/word, for an array of rules/words.</p>
+
+<p>So where are the actual rules now that I've extracted them out? And how are they tested? Separately of course, and easily testable. Here a Rules class I eventually ended up making (that gets injected into my FizzBuzz class) that represents my configuration:</p>
+
+{% highlight python %}
+class Rules(list):
+    def __init__(self):
+        list.__init__(self)
+        self.append(Rule((lambda i: i % 3 == 0), 'Fizz'))
+        self.append(Rule((lambda i: i % 5 == 0), 'Buzz'))
+{% endhighlight %}
+
+<p>In terms of testing the above class, all I need to test is that a rule exists in the array for "Fizz" and for "Buzz". I'm effectively just testing my configuration is correct, not the logic arround how rules/words are applied. Using Connascence I've been able to decouple my tests, and in doing so it's help drive out a solution where I've decoupled configuration from function. My FizzBuzz class doesn't need to know the details of the rules, it just applies them if necessary.</p>
+
+<h3>Context</h3>
+
+<p>To take a step back and look at the problem again...FizzBuzz is (as I know it) a drinking game. New rules are constantly added as the game progresses (making it harder and harder so more drink is consumed). If a rule applies, you say a specified word. If not you say a number. The above solution I've ended up with makes it very easy to add new rules without needing to change a lot of code. It's only when rules overide other rules etc... (new features!) that things get more complicated, but the code is in a good/flexible position to adapt now that I've refactored it and reduced coupling.</p>
+
+<h3>Summary</h3>
+
+<p>I've a nearly finished solution (lacking a couple of configuration tests) here: https://github.com/robertbeal/kata-fizzbuzz-py although keep in mind it only shows the destination, not the journey (so to speak). And while the above does test configuration and function, you would still compliment it with higher level tests as well.</p>
+
+<p>This post is just a very simplistic example of using Connascence to decouple your tests. I've not covered all of the levels of Connascence (although please click any links above for code examples) but I hope it shows a rough idea of how effective it can be at improving your code quality. It's obviously much easier to apply to a kata like FizzBuzz than "real" code, but that's something that comes with practise. All I can say is that once you try it (and see the light) you'll get hooked as it's quite an eye-opening, measurable tool for improving code quality.</p>

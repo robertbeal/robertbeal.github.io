@@ -1,0 +1,14 @@
+---
+layout: post
+title: Banshee crashing? Rebuild the database
+date: '2010-03-19T16:08:00.000Z'
+author: Rob
+tags:
+- Linux
+- Banshee
+modified_time: '2013-10-17T21:53:27.480+01:00'
+blogger_id: tag:blogger.com,1999:blog-7583560609041238092.post-7286148900717514552
+blogger_orig_url: http://robertbeal.blogspot.com/2010/03/banshee-crashing-rebuild-database.html
+---
+
+<p>In recent months I've become a dedicated <a href="http://banshee-project.org/">Banshee</a> user, and finally decided to drop Rhythmbox (bit dated / behind with the times) and Songbird (too slow for the size of collection I have). As of around v1.5.2 in Banshee they had fixed the slow load-up, and added a filesystem watcher. With those two things fixed, I made the switch.</p> <p>I currently run the latest version of Banshee via the PPA, but recently had the problem of Banshee crashing a lot. I gather it's from incompatible data between an older version I was running and the latest version. It was upon using v1.5.4 that if I tried to access certain tracks it would just crash.</p> <p>I ran Banshee via terminal and checked the logs, but couldn't get much info back. After reading around I found rebuilding the Banshee database fixed the issue, and allowed me to keep my library intact. This can be done by running:</p> <blockquote>sudo apt-get install -y sqlite3 &amp;&amp;<br/>sqlite3 ~/.config/banshee-1/banshee.db ".dump" &gt; dump &amp;&amp;<br/>mv ~/.config/banshee-1/banshee.db banshee.db.backup &amp;&amp;<br/>cat dump | sqlite3 ~/.config/banshee-1/banshee.db; </blockquote> <p>It basically dumps out your old database and recreates it. Thanks to gabaug for the fix.</p>

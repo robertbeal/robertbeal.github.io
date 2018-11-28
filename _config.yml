@@ -1,0 +1,27 @@
+# Permalinks
+permalink:      /:year-:month-:day/:title
+
+# Setup
+title:          Look mum...no hands!
+paginate:       5
+baseurl:        ""
+url:            "https://rob.kohi.uk"
+
+# Assets
+sass:
+  sass_dir:     _sass
+  style:        :compressed
+
+# About
+author:
+  name:         Rob Beal
+  url:          https://rob.kohi.uk
+
+# Custom vars
+version:        3.4.1
+github:
+  repo:         https://github.com/chesterhow/tale
+
+# Gems
+gems:
+  - jekyll-paginate

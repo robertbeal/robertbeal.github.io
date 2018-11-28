@@ -1,0 +1,15 @@
+---
+layout: post
+title: Running Mediatomb in Ubuntu with JS Support
+date: '2011-06-02T10:21:00.000+01:00'
+author: Rob
+tags:
+- Linux
+- Ubuntu
+- Mediatomb
+modified_time: '2013-10-17T21:53:27.430+01:00'
+blogger_id: tag:blogger.com,1999:blog-7583560609041238092.post-2674258553806198685
+blogger_orig_url: http://robertbeal.blogspot.com/2011/06/running-mediatomb-in-ubuntu-with-js.html
+---
+
+<p>Since Ubuntu Karmic 9.10, Mediatomb comes compiled without JavaScript support in the Ubuntu repositories. This is annoying as it removes one of the most powerful tools in Mediatomb, in that you can script how your media is imported via JavaScript functions. This is because of the reliance Mediatomb has on the "libmozjs" package which has, since 9.10, been removed from Ubuntu. It has been raised in <a href="https://bugs.launchpad.net/ubuntu/+source/mediatomb/+bug/568275" target="_blank">Launchpad as a bug and discussed</a>, but without a fix being officially published. Having given up waiting (now 3 releases, 12 months...!) for a fix, I decided to set about a solution myself.</p><a name='more'></a> <h3>Recompile Mediatomb</h3> <p>I came across a post on <a href="http://ebixio.com/blog/2010/08/03/how-to-enable-javascript-in-mediatomb-on-ubuntu/" target="_blank">how to enable JavaScript in Mediatomb</a>. This involves compiling the <a href="https://developer.mozilla.org/en/SpiderMonkey" target="_blank">SpiderMonkey</a> JavaScript engine, and then recompiling Mediatomb. Personally, I couldn't even get SpiderMonkey to compile, so gave up on this solution after a couple of hours.</p> <h3>Using Karmic Repositories</h3> <p>As a final attempt I decided to use the Karmic repositories. I added them to apt: <blockquote>sudo gedit /etc/apt/sources.list</blockquote>I then copied my current Ubuntu repository, "deb http://gb.archive.ubuntu.com/ubuntu/ natty universe", pasted it on a new line and changed "natty" to "karmic".<br/><br/>Opening up Synaptic Package Manager I searched for the "mediatomb" package. With it highlighted, I used the "Package" menu at the top of the window to firstly "Force Version" to the Karmic package and then "Lock" it. I did this for the following packages:  <ul>    <li>mediatomb</li>	     <li>mediatomb-common</li>    <li>mediatomb-daemon</li></ul> In doing so it should ask to install a number of additional packages (from the Karmic repository). Once everything is installed you should be able to run Mediatomb with full JavaScript support!</p>

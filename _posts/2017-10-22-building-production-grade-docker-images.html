@@ -1,0 +1,120 @@
+---
+layout: post
+title: Building production grade docker images
+date: '2017-10-22T11:59:00.000+01:00'
+author: Rob
+tags:
+- code
+modified_time: '2017-10-22T11:59:00.000+01:00'
+---
+
+<p>Looking through Docker Hub at numerous Dockerfiles and seeing how Docker is generally used, it's easy to see it's commonly being mis-used or giving a false sense of security. What we think is a contained, secure environment might be anything but that. Here are some common mistakes to avoid and good practises to follow.</p>
+
+<h1>Bad</h1>
+
+<h3>Beware the "docker" group</h3>
+
+<p>Be very careful when adding host users to the `docker` group. The docker daemon has root privileges so adding a user to the `docker` group is akin to giving a user sudo access without requiring a password. For example you can run:
+
+{% highlight bash %}
+docker run -ti --privileged -v /:/host alpine chroot /host
+{% endhighlight %}
+
+<p>It's a huge security risk, even for trusted users (should you leave your keyboard unlocked, or get exploited). Don't be lazy, stick to requiring `sudo` for using docker, or customise your `/etc/sudoers` file allowing `NOPASSWD` for safe (non-destructive) docker commands but still require it for destructive commands.</p>
+
+<h3>Root USER</h3>
+
+<p>In similar regards to the previous point, don't run your containers using the root user. While you may think your container is isolated, it's a huge risk allowing your container to run with root privileges in case it gets exploited. Would you run your own apps (or other people's code) on the host using root? I hope not...you shouldn't treat your containers any differently.</p> 
+
+<h3>Restarting containers</h3>
+
+If you're restarting containers, you're doing it wrong. Always `run` a container, stop it, remove it, then run a fresh one if needing to start it again. It ensures your containers can be pulled down and built back up again easily and quickly and aren't storing state.
+
+<h3>Avoid `latest`</h3>
+
+While latest is great for getting the most recent changes, in production it's a bit of a risk as at the point of pulling it will simply pull whatever is the latest. It's far better to specify the version you want in the run command that you execute as part of the deploy. 
+
+<h1>Good</h1>
+
+<h3>--read-only</h3>
+
+<p>For production-standard containers (I consider this a must) you should be running them in read-only mode. If your app being contained is compromised, it stops the hacker putting any exploits on the filesystem. If you do need some writable access, there are two options:</p>
+
+<ul>
+<li>`--tmpfs /tmp` - use a temporary file system</li>
+<li>`-v /foo:/foo - mount a volume. I use this when I need to write to a data directory, but want everything else locked down as read-only</li>
+</ul>
+
+<h3>Read only mounts</h3>
+
+<p>Further to the above, if you do need to mount a volume, you can make it read only too using `:ro`, for example `-v /foo:/foo:ro`. A good example is my use of MiniDLNA. I mount my music and videos as volumes in my container, but MiniDLNA doesn't need write access to those volumes so I mark them as `:ro`. 
+
+<h3>Managing init (PID1)</h3>
+
+<p>While not needed for all situations, if you find your entrypoint (for example a Java app) is doing one of the following...</p>
+
+<ul>
+<li>Is not reaping spawned zombie processes</li>
+<li>Is not respecting or doesn't have signal handlers set up</li>
+</ul>
+
+Then you should be using an init system that will handle the above for you like `tini` or `s6` (overlay). It'll ensure your containers shut down and fail properly (which is important so you know when to recreate them).
+
+<h3>Managing mount ownership</h3>
+
+Handling file ownership between the host and container can be tricky. Linux under the hood, uses User Id's for file ownership (usernames are mapped to UID's). You ideally want the UID's to match between container and host rather than having the container chown-ing files/folders during start up. There are a few simply solutions:
+
+<h4>Matching UID's</h4>
+
+This is my favourite and most secure of all the options. When building an image, and adding a non root user to run as, specify a random UID (rather than defaulting to 1000), for example 4999. Push the image to your registry as per normal. Now hosts can create a user with a matching UID...
+
+{% highlight bash %}
+# Host user....
+sudo useradd --no-create-home --system --shell /bin/false --uid 4999 git
+
+# Run the container...
+docker run \
+    --rm \
+    --user $(id git -u):$(id git -g) \
+    --read-only \
+    -v /var/data:/data \
+    -t foo
+{% endhighlight %}
+
+<h4>Matching username</h4>
+
+Alternatively if you don't want to play around with UID's, you simply need a user with a matching username. For example building a container that runs as the user `git`. You can mount `/etc/passwd` into the container, so the host and container user will lookup to the same UID. However, this does expose your hosts `/etc/passwd`.
+
+{% highlight bash %}
+# Host user....
+sudo useradd --no-create-home --system --shell /bin/false git
+
+# Run the container...
+docker run \
+    --rm \
+    --user $(id foo -u):$(id foo -g) \
+    --read-only \
+    -v /etc/passwd:/etc/passwd:ro \
+    -v /var/data:/data \
+    -t foo
+{% endhighlight %}
+
+<h4>Specifying Id's</h4>
+
+A final option is being able to specify the Id's when running the container. Using `usermod` in the `shadow` package in Alpine you can modify the user the container is running at on start up. The biggest compromise with this, is that you can't run in read-only mode as you are modifying the file system (`/etc/passwd`) at runtime and is the reason I don't use this method very often. 
+
+{% highlight bash %}
+docker run \
+    --rm \
+    -e PUID=$(id git -u) \
+    -e PGID=$(id git -g) \
+    -v /etc/passwd:/etc/passwd:ro \
+    -v /var/data:/data \
+    -t foo
+{% endhighlight %}
+
+<h3>Keep it small</h3>
+
+<p>For many of us this will mean using alpine as a base image rather than larger images like Ubuntu or Debian although the more hardcore may start from `scratch`. Not only does using a smaller image speed up pulls and deploys, but having a lighter image means fewer default processes running and a smaller attack surface. Unless you absolutely can't (in some cases Alpine can be tricky to get running, mainly in my experience from running `musl` as opposed to `glibc`) you should be using Alpine.</p>
+
+<p>Also be aware of the all the layers being created in your image. `docker history myimage` should show you all the layers your image is made up of.</p>  

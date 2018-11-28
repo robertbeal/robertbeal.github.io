@@ -1,0 +1,14 @@
+---
+layout: post
+title: Goodbye FreeNAS, Hello Ubuntu Server
+date: '2008-09-13T00:49:00.000+01:00'
+author: Rob
+tags:
+- Linux
+- Ubuntu
+modified_time: '2013-10-17T21:53:49.266+01:00'
+blogger_id: tag:blogger.com,1999:blog-7583560609041238092.post-2725132208810216512
+blogger_orig_url: http://robertbeal.blogspot.com/2008/09/goodbye-freenas-hello-ubuntu-server.html
+---
+
+<p>I've finally given up on <a href="http://www.freenas.org/" target="_blank">FreeNAS</a>. What was initially a great and simple system has turned out to be quite problematic. The two show stoppers for me where:</p> <ol>    <li>The hard drives, either went missing, wouldn't mount, would sometimes mount, then later fail. It was completely random, and the error log would literally say "error mounting", nothing more. This isn't very helpful for diagnosing the problem.</li>    <li>It wouldn't shut down properly. It was more of a reboot in that it would power up again! It worked initially but then would randomly stop working. I've no idea why.</li></ol> <a name='more'></a> <p>My server is an old Dell OptiPlex 170L, with an SiI 3114 Serial ATA Controller. Here's an <a href="http://www.robertbeal.com/wp-content/uploads/2008/09/output.html">HTML page with more detail</a>.</p> <p>I found the above using <a title="How to discover your hardware in Linux" href="http://ubuntu.wordpress.com/2007/02/18/find-hardware-specs-details-on-your-computer/" target="_blank">this great article</a>, and the command</p> <blockquote>sudo lshw -html &gt; output.html</blockquote> <p>Anyway, I've reverted back to <a href="http://www.ubuntu.com/products/whatisubuntu/serveredition" target="_blank">Ubuntu Server</a> and it's working great.</p> <ul>    <li>Boot up time is faster.</li>    <li>I can use EXT3 (instead of UFS) file system, and it's stable. This is especially handy as I use Linux on all of my pc's, so can always take a drive out of my server and mount it easily in another pc.</li>    <li>I can install other services / applications. Namely Git and Subversion.</li>    <li>Being a Linux user I'm a little more familiar with Ubuntu.</li></ul> <p>Given you pick the right hardware (which applies to Ubuntu too), FreeNAS would be great. The web interface is very easy to use and setup. And the initial install is incredibly simple. However, on my hardware it doesn't work, and Ubuntu does. So my advise is, if you're having trouble with FreeNAS, or are unsure, go with Ubuntu Server. Setup takes a little longer, but it just works and works. Plus you learn a little along the way which is always handy.</p>
