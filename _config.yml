@@ -1,24 +1,55 @@
-# permalinks
-permalink: /:year-:month-:day/:title
-
-# setup
 title: Engineering & Coffee
+description: >
+  Write an awesome description for your new site here. You can edit this
+  line in _config.yml. It will appear in your document head meta (for
+  Google search results) and in your feed.xml site description.
+github_username: robertbeal
+minimal_mistakes_skin: default
+search: true
+
+markdown: kramdown
+remote_theme: mmistakes/minimal-mistakes
+permalink: /:year-:month-:day/:title
 paginate: 5
-baseurl: ""
-url: "https://kohi.uk"
-remote_theme: "mmistakes/minimal-mistakes@4.16.6"
+paginate_path: /page:num/
+timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-# assets
-sass:
-  sass_dir: _sass
-  style: :compressed
+gems:
+  - jekyll-paginate
+  - jekyll-include-cache
 
-# about
+include:
+  - _pages
+
 author:
   name: Rob Beal
   url: https://kohi.uk
 
-# gems
-gems:
-  - jekyll-paginate
-  - jekyll-include-cache
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/robertbeal"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      url: "https://instagram.com/"
+
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: true
+      share: true
+      related: true
+  # _pages
+  - scope:
+      path: "_pages"
+      type: pages
+    values:
+      layout: single
+      author_profile: true
