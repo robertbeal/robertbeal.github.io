@@ -1,27 +1,23 @@
-# Permalinks
-permalink:      /:year-:month-:day/:title
+# permalinks
+permalink: /:year-:month-:day/:title
 
-# Setup
-title:          Look mum...no hands!
-paginate:       5
-baseurl:        ""
-url:            "https://rob.kohi.uk"
+# setup
+title: Engineering & Coffee
+paginate: 5
+baseurl: ""
+url: "https://kohi.uk"
+remote_theme: mmistakes/minimal-mistakes
 
-# Assets
+# assets
 sass:
-  sass_dir:     _sass
-  style:        :compressed
+  sass_dir: _sass
+  style: :compressed
 
-# About
+# about
 author:
-  name:         Rob Beal
-  url:          https://rob.kohi.uk
+  name: Rob Beal
+  url: https://kohi.uk
 
-# Custom vars
-version:        3.4.1
-github:
-  repo:         https://github.com/chesterhow/tale
-
-# Gems
+# gems
 gems:
   - jekyll-paginate
