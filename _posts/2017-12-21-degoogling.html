@@ -1,54 +1,120 @@
 ---
-layout: post
 title: Getting rid of Google
-date: '2017-12-21T11:59:00.000+01:00'
+date: "2017-12-21T11:59:00.000+01:00"
 author: Rob
 tags:
-modified_time: '2017-12-21T11:59:00.000+01:00'
+modified_time: "2017-12-21T11:59:00.000+01:00"
 ---
 
-<p>As part of my venture into improving my personal privacy I've finally taken the plunge and started to de-Google (ie become less reliant on Google's services such as gmail, calendar, contacts, play store etc...)</p>
+<p>
+  As part of my venture into improving my personal privacy I've finally taken
+  the plunge and started to de-Google (ie become less reliant on Google's
+  services such as gmail, calendar, contacts, play store etc...)
+</p>
 
 <h1>Why am I doing this?</h1>
 
-<p>Simply put, I don't want to be a product or money maker for large corporations at the expensive of my privacy... and to some extent my security given how much companies like Google know about me (should there be a leak or social hack etc...). As well as all the social implications, advertising and having services targeted or pushed at me.</p>
+<p>
+  Simply put, I don't want to be a product or money maker for large corporations
+  at the expensive of my privacy... and to some extent my security given how
+  much companies like Google know about me (should there be a leak or social
+  hack etc...). As well as all the social implications, advertising and having
+  services targeted or pushed at me.
+</p>
 
-<p>There's also an aspect of curiosity and experimentation behind my motivation. How deep into my life has Google rooted itself? How easily can I root it out?</p>
+<p>
+  There's also an aspect of curiosity and experimentation behind my motivation.
+  How deep into my life has Google rooted itself? How easily can I root it out?
+</p>
 
 <p>Either way, it's time to take back control.</p>
 
 <h1>Where do I start?</h1>
 
-<p>It can be quite overwhelming getting started especially with Google as they're integrated into so many day-to-day things...devices (pc's, laptops, phones), operating systems, browsers, apps, websites, services (email, events, messaging, music, photos) to name a few!</p>
+<p>
+  It can be quite overwhelming getting started especially with Google as they're
+  integrated into so many day-to-day things...devices (pc's, laptops, phones),
+  operating systems, browsers, apps, websites, services (email, events,
+  messaging, music, photos) to name a few!
+</p>
 
 <p>Luckily, I'm already part way along my journey:</p>
 <ul>
-<li>On PC I solely use Linux (Arch to be specific)</li>
-<li>On phone I use LineageOS (an open source version of Android, formerly known as Cyangogen) albeit with OpenGApps pico (a stripped down, minimal version of the Google suite of services)</li>
-<li>Firefox is my browser of choice across all devices</li>
+  <li>On PC I solely use Linux (Arch to be specific)</li>
+  <li>
+    On phone I use LineageOS (an open source version of Android, formerly known
+    as Cyangogen) albeit with OpenGApps pico (a stripped down, minimal version
+    of the Google suite of services)
+  </li>
+  <li>Firefox is my browser of choice across all devices</li>
 </ul>
 
 <h1>Reducing Google Dependencies</h1>
 
 <ul>
-<li>Calendar/Contacts - self-hosted using Linode as a VPS host with my own domain hosted on NameCheap. <a href="http://radicale.org/">Radicale</a> via docker for all my calendars and contacts. Versioning is done via git (I self host Gogs) of which backups go to AWS S3. I use gnome-calendar and gnome-contacts on PC, and DAVDroid on Android for managing everything.</li>
-<li><a href="https://microg.org/">MicroG framework</a> - a replacement on Android for the OpenGApps. While it still uses parts of Google (Google Cloud Messaging for example),  it does reduce some dependencies such as Location services and it's all open source (no hidden snooping etc...).</li>
-<li>F-droid, an open source Android app repository for all my apps</li>
-<li><a href="https://f-droid.org/en/packages/com.github.yeriomin.yalpstore/">Yalpstore</a>, an open source app for grabbing apps from the Google Play Store without needing the Google Play Store to be installed.</li>
-<li>Email - switching to <a href="https://tutanota.com/">Tutanota</a> (an encrypted, open source, DE hsoted mail service) using my own domain for all emails. While not as feature-full as Gmail, I does all I need (I actually realised I simply didn't need most of the features Gmail offers).</li>
-</ul> 
+  <li>
+    Calendar/Contacts - self-hosted using Linode as a VPS host with my own
+    domain hosted on NameCheap. <a href="http://radicale.org/">Radicale</a> via
+    docker for all my calendars and contacts. Versioning is done via git (I self
+    host Gogs) of which backups go to AWS S3. I use gnome-calendar and
+    gnome-contacts on PC, and DAVDroid on Android for managing everything.
+  </li>
+  <li>
+    <a href="https://microg.org/">MicroG framework</a> - a replacement on
+    Android for the OpenGApps. While it still uses parts of Google (Google Cloud
+    Messaging for example), it does reduce some dependencies such as Location
+    services and it's all open source (no hidden snooping etc...).
+  </li>
+  <li>F-droid, an open source Android app repository for all my apps</li>
+  <li>
+    <a href="https://f-droid.org/en/packages/com.github.yeriomin.yalpstore/"
+      >Yalpstore</a
+    >, an open source app for grabbing apps from the Google Play Store without
+    needing the Google Play Store to be installed.
+  </li>
+  <li>
+    Email - switching to <a href="https://tutanota.com/">Tutanota</a> (an
+    encrypted, open source, DE hsoted mail service) using my own domain for all
+    emails. While not as feature-full as Gmail, I does all I need (I actually
+    realised I simply didn't need most of the features Gmail offers).
+  </li>
+</ul>
 
 <h1>Easy switches</h1>
 
 <ul>
-<li>Calendar/contacts. Exporting calendars and contacts from Google and importing them into <a href="http://radicale.org/">Radicale</a> was very easy. Hosting Radicale took more time, as did setting up a VPS but since it has been running I've had zero issues and 100% uptime/</li>
-<li>F-droid. Using it for many of my Android apps has been easy, and is highly recommended.</li>
+  <li>
+    Calendar/contacts. Exporting calendars and contacts from Google and
+    importing them into <a href="http://radicale.org/">Radicale</a> was very
+    easy. Hosting Radicale took more time, as did setting up a VPS but since it
+    has been running I've had zero issues and 100% uptime/
+  </li>
+  <li>
+    F-droid. Using it for many of my Android apps has been easy, and is highly
+    recommended.
+  </li>
 </ul>
 
 <h1>Workable But Not Perfect Switches</h1>
 
 <ul>
-<li><a href="https://microg.org/">MicroG framework</a> - while it generally works very well, it's not perfect. Using other location providers work well enough but don't provide the same level of accuracy that Google offers. Cloud Messaging works well most of the time, but does have the odd blip which is annoying as it may mean I miss a notification.</li>
-<li><a href="https://f-droid.org/en/packages/com.github.yeriomin.yalpstore/">Yalpstore</a> - generally a great app but it lacks polish, and updating apps isn't fully automated.</li>
-<li>Email - switching to <a href="https://tutanota.com/">Tutanota</a> was very easy, but the pain is in migrating all my accounts and contacts on to it which will take time. Also their spam filters aren't as good as Gmail's.</li>
+  <li>
+    <a href="https://microg.org/">MicroG framework</a> - while it generally
+    works very well, it's not perfect. Using other location providers work well
+    enough but don't provide the same level of accuracy that Google offers.
+    Cloud Messaging works well most of the time, but does have the odd blip
+    which is annoying as it may mean I miss a notification.
+  </li>
+  <li>
+    <a href="https://f-droid.org/en/packages/com.github.yeriomin.yalpstore/"
+      >Yalpstore</a
+    >
+    - generally a great app but it lacks polish, and updating apps isn't fully
+    automated.
+  </li>
+  <li>
+    Email - switching to <a href="https://tutanota.com/">Tutanota</a> was very
+    easy, but the pain is in migrating all my accounts and contacts on to it
+    which will take time. Also their spam filters aren't as good as Gmail's.
+  </li>
 </ul>
