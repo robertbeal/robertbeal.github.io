@@ -28,7 +28,7 @@ include:
 author:
   name: Rob Beal
   avatar: "/assets/images/profile.jpg"
-  bio:
+  bio: parent, traveller, engineer, geek
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
