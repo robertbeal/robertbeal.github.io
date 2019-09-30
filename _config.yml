@@ -30,24 +30,18 @@ author:
   avatar: "/assets/images/profile.jpg"
   bio:
   links:
-    - label: "Website"
-      icon: "fas fa-fw fa-link"
-      url: "https://kohi.uk"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/robertbeal"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/robbeal"
     - label: "Flickr"
       icon: "fab fa-fw fa-flickr"
       url: "https://flickr.com/bealer"
 
 footer:
   links:
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/robertbeal"
-    - label: "Flickr"
-      icon: "fab fa-fw fa-flickr"
-      url: "https://flickr.com/bealer"
 
 defaults:
   # _posts
