@@ -8,8 +8,8 @@ modified_time: "2020-01-11T11:59:00.000+01:00"
 
 <p>
   Acquired by GitHub in 2019, Dependabot is a free bot application that checks for dependency updates, creates pull requests and can even 
-  merge them for you. It's one more exciting tools to use in a DevOps culture (and something we heavily use at LandTech). I know, I know... what's so
-  exciting about a glorified DevOps orientated bot? For me, beyond the tool itself, it's largely what it implies to be able to use it to its full potential. 
+  merge them for you. It's one of the more exciting tools to use in a DevOps culture (and something we heavily use at LandTech). I know, I know... what's so
+  exciting about a glorified dependency bot? For me, beyond the tool itself, it's largely what it implies to be able to use it to its full potential. 
   Let me explain...
 </p>
 
@@ -18,9 +18,9 @@ modified_time: "2020-01-11T11:59:00.000+01:00"
 <p>
   At LandTech we manage thousands of dependencies across all of our codebase. Regularly upgrading such code dependencies is not something 
   that really gives me joy, nor would I imagine does it most engineers. And as part of that it is not something
-  I do nearly often enough. I've seen endless codebases where dependencies are months or even years behind, long out of support. More often that not
+  I do nearly often enough. I've seen endless codebases where dependencies are months or even years behind, long out of support, many major versions behind. More often than not
   it's not seen as a probem until something needs to be changed... taking far, far longer than it should. Or arguably even worse, a breach or 
-  security incident occurs due to upatched dependencies. 
+  security incident occurs due to unpatched dependencies. 
 </p>
 
 <h2>A different way...</h2>
@@ -29,7 +29,7 @@ modified_time: "2020-01-11T11:59:00.000+01:00"
   By having Dependabot track and create pull requests for dependency updates it takes away something engineers have to be mindful of, that eats
   up part of their mental capacity. It allows codebases to stay up-to-date, securely patched, within support and reduces the feedback time it takes
   to discover a breaking change (you don't have to fix the breaking change, but you are aware and have the option to). It means codebase change 
-  remains easy and fast rather than slowing over time and increasing in difficulty. 
+  remains easy and fast rather than slowing over time, increasing in difficulty. 
 </p>
 
 <h2>Fully automating the process</h2>
@@ -41,14 +41,14 @@ modified_time: "2020-01-11T11:59:00.000+01:00"
 
 <p>
   Enter auto-merging, an advanced feature in Dependabot to automatically merge pull requests given any necessary CI steps have passed.
-  Auto-merging can be something people struggle to agree with... What it my app breaks? What if there's an outage? I usually ask the same questions... 
+  Auto-merging can be something people struggle to agree with... What it my app breaks? What if there's an outage? I usually ask the same question... 
   What do you need to put in place to give you the confidence that it won't? Need more tests? Then add more tests. Need
   dark/canary deploys? Then add better deploy tooling. Need automated rollbacks based off metrics? Then add that too!
 </p>
 
 <p>
   It does mean investing time in such improvements, but it is time well spent. You end up with a more robust CI/CD pipeline enabling you to auto-merge 
-  code dependency updates. Applications stay up-to-date, in support, secure and easy/fast to change. And engineers can focus more time on delivering 
-  value rather than operational overhead.
+  code dependency updates. Applications stay up-to-date, in support, secure and easy/fast to change. Engineers can focus more time on things that give them joy, ie learning, solving problems and delivering 
+  value, rather than repeating, joyless operational tasks.
 </p>
 
