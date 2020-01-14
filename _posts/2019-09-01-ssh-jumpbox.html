@@ -29,7 +29,7 @@ A jumpbox is a host you connect/tunnel through to access a target (hidden) host.
 <h2>Building an SSH Jumpbox</h2>
 
 <p>
-We settled on using Docker for creating our jumpbox, hosted on an EC2 instance via ECS. Docker was largely chosen because of the fast feedback loop from being able to test-drive the container (via `testinfra`) to running/debugging it locally (and consistently) and tearing it up/down on AWS easily.
+We settled on using Docker for creating our jumpbox, hosted on an EC2 instance via ECS. Docker was largely chosen because of the fast feedback loop from being able to test-drive the container (via <pre>testinfra</pre>) to running/debugging it locally (and consistently) and tearing it up/down on AWS easily.
 </p>
 
 <p>
@@ -37,7 +37,7 @@ The container is based on an alpine image for a smaller size and attack surface,
 </p>
 
 <ul>
-    <li>`openssh` for our SSH server. We have locked down `/etc/ssh/sshd_config`:
+    <li><pre>openssh</pre> for our SSH server. We have locked down <pre>/etc/ssh/sshd_config</pre>:
         <ul>
             <li>not allowing interactive mode (there's no reason to be on the jumpbox)</li>
             <li>not allowing password auth (as it is less secure than key-based)</li>
@@ -45,12 +45,12 @@ The container is based on an alpine image for a smaller size and attack surface,
             <li>forcing SSH protocol 2</li>
         </ul>
     </li>
-    <li>`rsyslog` for managing our logs (and sending them to our logging platform)</li>
-    <li>`fail2ban` for banning malicious activity per ip address</li>
-    <li>`s6` overlay as our process supervisor, managing all the above processes</li>
+    <li><pre>rsyslog</pre> for managing our logs (and sending them to our logging platform)</li>
+    <li><pre>fail2ban</pre> for banning malicious activity per ip address</li>
+    <li><pre>s6</pre> overlay as our process supervisor, managing all the above processes</li>
 </ul>
 
-<p>Here is our `Dockerfile`:</p>
+<p>Here is our <pre>Dockerfile</pre>:</p>
 
 {% highlight docker %}
 FROM alpine:latest
@@ -87,7 +87,7 @@ ENTRYPOINT ["/init"]
 {% endhighlight %}
 
 <p>
-As part of building our jumpbox, we create a (password disabled) user on the jumpbox for each user on AWS. This is easily done using a bash script and `boto`. For each user created on the jumpbox, we get the public SSH key associated with respective AWS user and add it as an `~/.ssh/authorized_keys` (so the user is allowed to connect via SSH). This relates our AWS users to the jumpbox users and means there is no user/key sharing happening and we have cleaner/clearer auditing as a consequence! If someone new starts or leaves, we simply need to update our AWS users and kick off a CI build and deploy (which takes no more than 2 minutes) to refresh the container.
+As part of building our jumpbox, we create a (password disabled) user on the jumpbox for each user on AWS. This is easily done using a bash script and <pre>boto</pre>. For each user created on the jumpbox, we get the public SSH key associated with respective AWS user and add it as an <pre>~/.ssh/authorized_keys</pre> (so the user is allowed to connect via SSH). This relates our AWS users to the jumpbox users and means there is no user/key sharing happening and we have cleaner/clearer auditing as a consequence! If someone new starts or leaves, we simply need to update our AWS users and kick off a CI build and deploy (which takes no more than 2 minutes) to refresh the container.
 </p>
 
 {% highlight docker %}
@@ -130,7 +130,7 @@ done <<< "$users"
 <h2>Testing our container</h2>
 
 <p>
-We use the rather awesome `testinfra` python package to help us test-drive our container. Using it we can test numerous things from packages installed to more complex tests such as checking a logging platform connection is 'ESTABLISHED' via `netstat`. We have over 20 tests, here's a snippet of some:
+We use the rather awesome <pre>testinfra</pre> python package to help us test-drive our container. Using it we can test numerous things from packages installed to more complex tests such as checking a logging platform connection is <pre>ESTABLISHED</pre> via <pre>netstat</pre>. We have over 20 tests, here's a snippet of some:
 </p>
 
 {% highlight python %}
@@ -176,9 +176,9 @@ def test_users(host):
 <h2>Running our container</h2>
 
 <p>
-As `fail2ban` uses iptables under the hood for banning ip addresses, the container needs to run with slightly elevated privileges. This translates into giving the container `NET_ADMIN` privileges (this is an inbuilt Linux privilege), the minimum privileges needed in order for the container to be able to modify `iptables` of the host. In a `docker run` command this translates as `--cap-add=NET_ADMIN`.
+As <pre>fail2ban</pre> uses iptables under the hood for banning ip addresses, the container needs to run with slightly elevated privileges. This translates into giving the container <pre>NET_ADMIN</pre> privileges (this is an inbuilt Linux privilege), the minimum privileges needed in order for the container to be able to modify <pre>iptables</pre> of the host. In a <pre>docker run</pre> command this translates as <pre>--cap-add=NET_ADMIN</pre>.
 </p>
 
 <p>
-The container can also run in `--readonly` mode meaning it can't be modified, just for that added bit of security. We mount our log directory into the container meaning we also retain our log files after a deploy.
+The container can also run in <pre>--readonly</pre> mode meaning it can't be modified, just for that added bit of security. We mount our log directory into the container meaning we also retain our log files after a deploy.
 </p>
