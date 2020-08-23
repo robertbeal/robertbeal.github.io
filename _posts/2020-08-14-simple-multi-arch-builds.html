@@ -1,0 +1,106 @@
+---
+title: Simple Multi-Arch Docker Builds
+date: "2020-08-16T11:59:00.000+01:00"
+author: Rob
+tags: devops, docker
+modified_time: "2020-08-16T11:59:00.000+01:00"
+---
+
+<p>
+  I've been doing multi-arch builds for a while as many images I use
+  run on an array of architectures at home, least not my small farm of 
+  raspberry pi's. I've recently decided to try and simplify my build set up
+  and came across `buildx` as well as deciding to migrate to GitHub Actions.
+</p>
+
+<h2>Using `docker buildx build`</h2>
+
+<p>
+  As of writing this post, `docker buildx` is an experimental feature but allows
+  you to build an image in an array of architectures with a single command that
+  effectively wraps what `docker manifest` does for you. Here's a simple example:
+</p>
+
+{% highlight docker %}
+FROM alpine:3.12
+
+ENTRYPOINT ["echo", "hello!"]
+{% endhighlight %}
+
+{% highlight bash %}
+docker buildx build \
+  --tag hello:latest \
+  --tag hello:1.0 \
+  --platform linux/amd64,linux/arm/v7,linux/arm64 .
+{% endhighlight %}
+
+You can even have `buildx` push your built images (given you're logged into a registry) with an additional "push" flag in the command:
+
+{% highlight bash %}
+docker buildx build \
+  --push \
+  --tag hello:latest \
+  --tag hello:1.0 \
+  --platform linux/amd64,linux/arm/v7,linux/arm64 .
+{% endhighlight %}
+
+<h2>Building From Source</h2>
+
+<p>
+  Previously, using my Syncthing image as an example. I'd do multiple `docker build`s, one for
+  each architecture, by passing in the architecture ("$ARCH") as a `--build-arg`, and within 
+  the Dockerfile I'd download a version of Syncthing for the specified architecture I was building.
+</p>
+
+<p>
+  With `buildx`, the build runs as a single command so I'm not able to control
+  which architecture version of the app to download and install within the Dockerfile. Building
+  from source simplifies this and is arguably a better, more agnostic thing to do.
+</p>
+
+<h2>Tying It Together With GitHub Actions</h2>
+
+<p>
+  I've recentl been starting a migration to GitHub Actions from a mixture of CircleCI and Travis. 
+  Neither are bad options, but GitHub Actions does have a few features that really interest me. Path 
+  matching is the first, effectively allowing easier "mono" repo support (or at least repo's with multiple
+  concepts), or simply ignoring certain files from triggering a build. 
+</p>
+
+<p>
+  The second feature is the easy of using community actions, of which both python and docker buildx
+  were easy for me to hook up. Granted GitHub Actions isn't as fast when comparing equivalent
+  builds, but I can live it. Here's a snippet taken from [my build file](https://github.com/robertbeal/docker-syncthing/blob/main/.github/workflows/build.yml):
+</p>
+
+{% highlight yaml %}
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: variables
+        run: curl --silent https://api.github.com/repos/syncthing/syncthing/releases/latest | jq -r '.tag_name' > version
+
+      - name: build dependencies
+        uses: crazy-max/ghaction-docker-buildx@v3
+        with:
+          version: latest
+
+      - name: docker hub login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: build
+        run: |
+          docker buildx build \
+            --push \
+            --tag robertbeal/syncthing:latest \
+            --tag robertbeal/syncthing:$(cat version) \
+            --build-arg=VERSION="$(cat version)" \
+            --build-arg=COMMIT_ID="$GITHUB_SHA" \
+            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8 .
+{% endhighlight %}
+
+
