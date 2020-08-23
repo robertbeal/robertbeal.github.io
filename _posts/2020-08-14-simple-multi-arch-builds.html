@@ -31,7 +31,7 @@ ENTRYPOINT ["echo", "hello!"]
 docker buildx build \
   --tag hello:latest \
   --tag hello:1.0 \
-  --platform linux/amd64,linux/arm/v7,linux/arm64 .
+  --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8 .
 {% endhighlight %}
 
 You can even have `buildx` push your built images (given you're logged into a registry) with an additional "push" flag in the command:
@@ -41,7 +41,7 @@ docker buildx build \
   --push \
   --tag hello:latest \
   --tag hello:1.0 \
-  --platform linux/amd64,linux/arm/v7,linux/arm64 .
+  --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8 .
 {% endhighlight %}
 
 <h2>Building From Source</h2>
