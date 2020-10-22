@@ -48,7 +48,7 @@ docker buildx build \
 
 <p>
   Previously, using my Syncthing image as an example. I'd do multiple docker builds, one for
-  each architecture, by passing in the architecture ("$ARCH") as a <i>--build-arg</i>i>, and within 
+  each architecture, by passing in the architecture ("$ARCH") as a <i>--build-arg</i>, and within 
   the Dockerfile I'd download a version of Syncthing for the specified architecture I was building.
 </p>
 
@@ -61,16 +61,16 @@ docker buildx build \
 <h2>Tying It Together With GitHub Actions</h2>
 
 <p>
-  I've recentl been starting a migration to GitHub Actions from a mixture of CircleCI and Travis. 
+  I've recently been starting a migration to GitHub Actions from a mixture of CircleCI and Travis. 
   Neither are bad options, but GitHub Actions does have a few features that really interest me. Path 
   matching is the first, effectively allowing easier "mono" repo support (or at least repo's with multiple
-  concepts), or simply ignoring certain files from triggering a build. 
+  concepts), or simply ignoring certain files from triggering a build (such as README.md's).
 </p>
 
 <p>
   The second feature is the easy of using community actions, of which both python and docker buildx
   were easy for me to hook up. Granted GitHub Actions isn't as fast when comparing equivalent
-  builds, but I can live it. Here's a snippet taken from <a href="https://github.com/robertbeal/docker-syncthing/blob/main/.github/workflows/build.yml">my build file</a>:
+  builds, but I can live with it. Here's a snippet taken from <a href="https://github.com/robertbeal/docker-syncthing/blob/main/.github/workflows/build.yml">my build file</a>:
 </p>
 
 {% highlight yaml %}
