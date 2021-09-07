@@ -35,7 +35,7 @@ author:
       url: "https://github.com/robertbeal"
     - label: "GPG Key"
       icon: "fab fa-fw fa-keybase"
-      url: "http://keys.gnupg.net/pks/lookup?op=get&fingerprint=on&search=0x0C1B9F3B4BD872DD"
+      url: "https://raw.githubusercontent.com/robertbeal/robertbeal/main/public.gpg"
     - label: "LinkedIn"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/in/robbeal"
