@@ -1,13 +1,150 @@
 ---
 title: Lessons in using rake for builds and deploys
-date: '2012-07-26T11:57:00.000+01:00'
+date: "2012-07-26T11:57:00.000+01:00"
 author: Rob
 tags:
-- Programming
-- Ruby
-modified_time: '2013-10-17T21:53:15.195+01:00'
+  - Programming
+  - Ruby
+modified_time: "2013-10-17T21:53:15.195+01:00"
 blogger_id: tag:blogger.com,1999:blog-7583560609041238092.post-4555476913219900353
 blogger_orig_url: http://robertbeal.blogspot.com/2012/07/lessons-in-using-rake-for-builds-and.html
 ---
 
-<p>I've been using rake for a few years now to do builds and deployments. It first started off at <a href="http://huddle.com" target="_blank">Huddle</a>, as a way of escaping NAnt due to it's xml nastiness and lack of power. Being honest, it was a naive step into Ruby and the outcome was a poorly written, C# styled set of scripts that were untested. From that point I've learnt a number of lessons...</p><a name='more'></a> <h3>Best Practise</h3> <p>If you're new to Ruby, first things first, find out how write and use the language as per it's typical standards. This goes from naming classes, to methods, to requiring other classes. I've decided not to include any links as this should be an exploratory phase. Read a book, go on Google and start searching for terms such as "Ruby best practise" etc..., find some well-known, mature Ruby projects in Github and have a browse around the code. There are plenty of places to find where Ruby is written correctly.</p> <strong>You're doing something wrong if:</strong> <ul>    <li>You find you're self doing more than a simple "require 'myclass'" and have __FILE__ expands etc... for referencing other classes.</li>    <li>Your scripts are littered with GLOBAL_CONSTANTS that are being used by child "required" Ruby files.</li>    <li>Your classes aren't as clean as they would be in another language. Say for example, you have come from C#. An equivalent Ruby class should look just as clean, if not a little cleaner.</li>    <li>Your rakefile is not easy to read, and see what tasks it can perform, ie tasks are created and hidden in the depths of your code</li>    <li>Your putting complex logic in without any tests around it.</li></ul> <h3>Keep It Simple</h3> <p>I've written my own build framework, <a href="https://bitbucket.org/robertbeal/rakeoff" target="_blank">rakeoff</a>, but generally speaking it's not typically required as it will add complexity and logic behind the scenes that others won't know about. Your scripts should be fairly simple as building, testing and deploying often aren't complicated steps.</p> <p>Where possible, do the simplest thing possible, ie just get rake to execute a command line. If the command line fails, you'll see what and why in the build logs. You don't need anything more clever than that. By keeping it closer to command lines means it's easier to understand and replay locally.</p> <style type="text/css">pre.CICodeFormatter{  font-family:arial;  font-size:12px;  border:1px dashed #CCCCCC;  width:99%;  height:auto;  overflow:auto;  background:#f0f0f0;  line-height:20px;  background-image:URL(http://2.bp.blogspot.com/_z5ltvMQPaa8/SjJXr_U2YBI/AAAAAAAAAAM/46OqEP32CJ8/s320/codebg.gif);  padding:0px;  color:#000000;  text-align:left; } pre.CICodeFormatter code{  color:#000000;  word-wrap:normal; } </style><pre class="CICodeFormatter" ><code class="CICodeFormatter"> task :msbuild do  <br />    sh '%windir%/microsoft.net/framework/v3.5/msbuild.exe /t:Clean;Build /p:Configuration=Release /m /consoleloggerparameters:ErrorsOnly MySolution.sln'  <br /> end  <br /></code></pre> <h3>Gems & Bundler</h3> <p>Using gems (and Bundler) should be pretty standard. Not only for external libraries, but internal ones. Don't go writing a bunch of scripts that are shared across applications, because when you update them you risk breaking all of your apps. Allow apps to determine what version of your scripts they want to run via a Gemfile.</p> <p>Also it's far nicer to build a gem, then simply have a "require 'blah'" in your code and it's working, rather than trying to include a Ruby file (via a submodule if it's shared).</p> <h3>Visibility</h3> <p>If you're not going to use "rake --tasks" for seeing what tasks are available (and from my experience not many people do that), then I would advise keeping all your tasks inside your main rakefile. Ie, don't have tasks hidden away in other scripts, keep them visible upfront in your rakefile.</p> <pre class="CICodeFormatter" ><code class="CICodeFormatter"> task :unit_tests do  <br />   run_tests('*.Unit.Tests')  <br /> end  <br /><br /> task :integration_tests, :environment do |t, args|  <br />   run_tests('*.Tests.Integration', args.environment)  <br /> end  <br /><br /> task :acceptance_tests, :environment do |t, args|  <br />   run_tests('*.Tests.Acceptance', args.environment)  <br /> end  <br /><br /> task :smoke_tests, :environment do |t, args|  <br />   run_tests('*.Tests.Smoke', args.environment)  <br /> end  <br /><br /> def run_tests(pattern, environment='local')  <br />   // Do some stuff  <br /> end  <br /></code></pre> <h3>Testing</h3> <p>In cases where you're simply calling a command line, you shouldn't really need testing, assuming the command line will fail if mis-used (if it won't they you may need to consider tests). Your build environment will act as your tests and show you when something is broken. This should not affect live, as your internal environments should deploy in the same way, so you'll find out if something is broken internally first.</p> <p>If on occasion you do need to test some logic, then create a class that can be easily tested (as rake tasks can be a pain to test). Your rake task then just needs to call it (keep the task as thin as possible).</p> <pre class="CICodeFormatter" ><code class="CICodeFormatter"> task :unit_tests do  <br />   NUnit.new.run('*.Unit.Tests')  <br /> end  <br /></code></pre> <h3>Artifacts</h3> <p>One area you can easily break your build is around building up artifacts. If this dependency is put in your build environment (such as Team City), then it won't be testable. Often builds will fail if they can't find an artifact (say you want to deploy a build), but they may not if the artifacts exist, but are missing files, or aren't correct for whatever reason. Because of this I would either advise:</p> <p>a) keeping artifact configuration as simple as possible in your build environment. If you've got more than a few lines for including artifacts, then you should question if building the artifacts is more complex than it needs to be.</p> <p>b) building your artifacts in your Ruby scripts. That way you can, if needs be, test them and replicate it locally. Being able to replicate an artifact build locally is very useful when trying to fix an issue.</p>
+<p>
+  I've been using rake for a few years now to do builds and deployments. It
+  first started off at <a href="http://huddle.com" target="_blank">Huddle</a>,
+  as a way of escaping NAnt due to it's xml nastiness and lack of power. Being
+  honest, it was a naive step into Ruby and the outcome was a poorly written, C#
+  styled set of scripts that were untested. From that point I've learnt a number
+  of lessons...
+</p>
+<a name="more"></a>
+<h3>Best Practise</h3>
+<p>
+  If you're new to Ruby, first things first, find out how write and use the
+  language as per it's typical standards. This goes from naming classes, to
+  methods, to requiring other classes. I've decided not to include any links as
+  this should be an exploratory phase. Read a book, go on Google and start
+  searching for terms such as "Ruby best practise" etc..., find some well-known,
+  mature Ruby projects in Github and have a browse around the code. There are
+  plenty of places to find where Ruby is written correctly.
+</p>
+<strong>You're doing something wrong if:</strong>
+<ul>
+  <li>
+    You find you're self doing more than a simple "require 'myclass'" and have
+    __FILE__ expands etc... for referencing other classes.
+  </li>
+  <li>
+    Your scripts are littered with GLOBAL_CONSTANTS that are being used by child
+    "required" Ruby files.
+  </li>
+  <li>
+    Your classes aren't as clean as they would be in another language. Say for
+    example, you have come from C#. An equivalent Ruby class should look just as
+    clean, if not a little cleaner.
+  </li>
+  <li>
+    Your rakefile is not easy to read, and see what tasks it can perform, ie
+    tasks are created and hidden in the depths of your code
+  </li>
+  <li>Your putting complex logic in without any tests around it.</li>
+</ul>
+<h3>Keep It Simple</h3>
+<p>
+  I've written my own build framework,
+  <a href="https://bitbucket.org/robertbeal/rakeoff" target="_blank">rakeoff</a
+  >, but generally speaking it's not typically required as it will add
+  complexity and logic behind the scenes that others won't know about. Your
+  scripts should be fairly simple as building, testing and deploying often
+  aren't complicated steps.
+</p>
+<p>
+  Where possible, do the simplest thing possible, ie just get rake to execute a
+  command line. If the command line fails, you'll see what and why in the build
+  logs. You don't need anything more clever than that. By keeping it closer to
+  command lines means it's easier to understand and replay locally.
+</p>
+<style type="text/css">
+  pre.CICodeFormatter {
+    font-family: arial;
+    font-size: 12px;
+    border: 1px dashed #cccccc;
+    width: 99%;
+    height: auto;
+    overflow: auto;
+    background: #f0f0f0;
+    line-height: 20px;
+    background-image: URL(http://2.bp.blogspot.com/_z5ltvMQPaa8/SjJXr_U2YBI/AAAAAAAAAAM/46OqEP32CJ8/s320/codebg.gif);
+    padding: 0px;
+    color: #000000;
+    text-align: left;
+  }
+  pre.CICodeFormatter code {
+    color: #000000;
+    word-wrap: normal;
+  }
+</style>
+<pre
+  class="CICodeFormatter"
+><code class="CICodeFormatter"> task :msbuild do  <br />    sh '%windir%/microsoft.net/framework/v3.5/msbuild.exe /t:Clean;Build /p:Configuration=Release /m /consoleloggerparameters:ErrorsOnly MySolution.sln'  <br /> end  <br /></code></pre>
+<h3>Gems & Bundler</h3>
+<p>
+  Using gems (and Bundler) should be pretty standard. Not only for external
+  libraries, but internal ones. Don't go writing a bunch of scripts that are
+  shared across applications, because when you update them you risk breaking all
+  of your apps. Allow apps to determine what version of your scripts they want
+  to run via a Gemfile.
+</p>
+<p>
+  Also it's far nicer to build a gem, then simply have a "require 'blah'" in
+  your code and it's working, rather than trying to include a Ruby file (via a
+  submodule if it's shared).
+</p>
+<h3>Visibility</h3>
+<p>
+  If you're not going to use "rake --tasks" for seeing what tasks are available
+  (and from my experience not many people do that), then I would advise keeping
+  all your tasks inside your main rakefile. Ie, don't have tasks hidden away in
+  other scripts, keep them visible upfront in your rakefile.
+</p>
+<pre
+  class="CICodeFormatter"
+><code class="CICodeFormatter"> task :unit_tests do  <br />   run_tests('*.Unit.Tests')  <br /> end  <br /><br /> task :integration_tests, :environment do |t, args|  <br />   run_tests('*.Tests.Integration', args.environment)  <br /> end  <br /><br /> task :acceptance_tests, :environment do |t, args|  <br />   run_tests('*.Tests.Acceptance', args.environment)  <br /> end  <br /><br /> task :smoke_tests, :environment do |t, args|  <br />   run_tests('*.Tests.Smoke', args.environment)  <br /> end  <br /><br /> def run_tests(pattern, environment='local')  <br />   // Do some stuff  <br /> end  <br /></code></pre>
+<h3>Testing</h3>
+<p>
+  In cases where you're simply calling a command line, you shouldn't really need
+  testing, assuming the command line will fail if mis-used (if it won't they you
+  may need to consider tests). Your build environment will act as your tests and
+  show you when something is broken. This should not affect live, as your
+  internal environments should deploy in the same way, so you'll find out if
+  something is broken internally first.
+</p>
+<p>
+  If on occasion you do need to test some logic, then create a class that can be
+  easily tested (as rake tasks can be a pain to test). Your rake task then just
+  needs to call it (keep the task as thin as possible).
+</p>
+<pre
+  class="CICodeFormatter"
+><code class="CICodeFormatter"> task :unit_tests do  <br />   NUnit.new.run('*.Unit.Tests')  <br /> end  <br /></code></pre>
+<h3>Artifacts</h3>
+<p>
+  One area you can easily break your build is around building up artifacts. If
+  this dependency is put in your build environment (such as Team City), then it
+  won't be testable. Often builds will fail if they can't find an artifact (say
+  you want to deploy a build), but they may not if the artifacts exist, but are
+  missing files, or aren't correct for whatever reason. Because of this I would
+  either advise:
+</p>
+<p>
+  a) keeping artifact configuration as simple as possible in your build
+  environment. If you've got more than a few lines for including artifacts, then
+  you should question if building the artifacts is more complex than it needs to
+  be.
+</p>
+<p>
+  b) building your artifacts in your Ruby scripts. That way you can, if needs
+  be, test them and replicate it locally. Being able to replicate an artifact
+  build locally is very useful when trying to fix an issue.
+</p>
