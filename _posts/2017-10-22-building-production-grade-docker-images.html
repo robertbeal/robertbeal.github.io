@@ -123,7 +123,12 @@ normal. Now hosts can create a user with a matching UID...
 sudo useradd --no-create-home --system --shell /bin/false --uid 4999 git 
 
 # Run the container... 
-docker run \ --rm \ --user $(id git -u):$(id git -g) \ --read-only \ -v /var/data:/data \ -t foo 
+docker run \ 
+  --rm \ 
+  --user $(id git -u):$(id git -g) \ 
+  --read-only \ 
+  -v /var/data:/data \ 
+  -t foo 
 {% endhighlight %}
 
 <h4>Matching username</h4>
@@ -139,7 +144,13 @@ container user will lookup to the same UID. However, this does expose your hosts
 sudo useradd --no-create-home --system --shell /bin/false git 
 
 # Run the container... 
-docker run \ --rm \ --user $(id foo -u):$(id foo -g) \ --read-only \ -v /etc/passwd:/etc/passwd:ro \ -v /var/data:/data \ -t foo
+docker run \
+  --rm \
+  --user $(id foo -u):$(id foo -g) \ 
+  --read-only \ 
+  -v /etc/passwd:/etc/passwd:ro \ 
+  -v /var/data:/data \ 
+  -t foo
 {% endhighlight %}
 
 <h4>Specifying Id's</h4>
@@ -151,7 +162,13 @@ you can't run in read-only mode as you are modifying the file system
 (`/etc/passwd`) at runtime and is the reason I don't use this method very often.
 
 {% highlight bash %} 
-docker run \ --rm \ -e PUID=$(id git -u) \ -e PGID=$(id git -g) \ -v /etc/passwd:/etc/passwd:ro \ -v /var/data:/data \ -t foo
+docker run \ 
+  --rm \ 
+  -e PUID=$(id git -u) \ 
+  -e PGID=$(id git -g) \ 
+  -v /etc/passwd:/etc/passwd:ro \ 
+  -v /var/data:/data \ 
+  -t foo
 {% endhighlight %}
 
 <h3>Keep it small</h3>
