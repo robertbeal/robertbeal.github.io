@@ -116,10 +116,15 @@ few simply solutions:
 This is my favourite and most secure of all the options. When building an image,
 and adding a non root user to run as, specify a random UID (rather than
 defaulting to 1000), for example 4999. Push the image to your registry as per
-normal. Now hosts can create a user with a matching UID... {% highlight bash %}
-# Host user.... sudo useradd --no-create-home --system --shell /bin/false --uid
-4999 git # Run the container... docker run \ --rm \ --user $(id git -u):$(id git
--g) \ --read-only \ -v /var/data:/data \ -t foo {% endhighlight %}
+normal. Now hosts can create a user with a matching UID... 
+
+{% highlight bash %}
+# Host user.... 
+sudo useradd --no-create-home --system --shell /bin/false --uid 4999 git 
+
+# Run the container... 
+docker run \ --rm \ --user $(id git -u):$(id git -g) \ --read-only \ -v /var/data:/data \ -t foo 
+{% endhighlight %}
 
 <h4>Matching username</h4>
 
@@ -127,10 +132,15 @@ Alternatively if you don't want to play around with UID's, you simply need a
 user with a matching username. For example building a container that runs as the
 user `git`. You can mount `/etc/passwd` into the container, so the host and
 container user will lookup to the same UID. However, this does expose your hosts
-`/etc/passwd`. {% highlight bash %} # Host user.... sudo useradd
---no-create-home --system --shell /bin/false git # Run the container... docker
-run \ --rm \ --user $(id foo -u):$(id foo -g) \ --read-only \ -v
-/etc/passwd:/etc/passwd:ro \ -v /var/data:/data \ -t foo {% endhighlight %}
+`/etc/passwd`. 
+
+{% highlight bash %} 
+# Host user.... 
+sudo useradd --no-create-home --system --shell /bin/false git 
+
+# Run the container... 
+docker run \ --rm \ --user $(id foo -u):$(id foo -g) \ --read-only \ -v /etc/passwd:/etc/passwd:ro \ -v /var/data:/data \ -t foo
+{% endhighlight %}
 
 <h4>Specifying Id's</h4>
 
@@ -139,9 +149,10 @@ Using `usermod` in the `shadow` package in Alpine you can modify the user the
 container is running at on start up. The biggest compromise with this, is that
 you can't run in read-only mode as you are modifying the file system
 (`/etc/passwd`) at runtime and is the reason I don't use this method very often.
-{% highlight bash %} docker run \ --rm \ -e PUID=$(id git -u) \ -e PGID=$(id git
--g) \ -v /etc/passwd:/etc/passwd:ro \ -v /var/data:/data \ -t foo {%
-endhighlight %}
+
+{% highlight bash %} 
+docker run \ --rm \ -e PUID=$(id git -u) \ -e PGID=$(id git -g) \ -v /etc/passwd:/etc/passwd:ro \ -v /var/data:/data \ -t foo
+{% endhighlight %}
 
 <h3>Keep it small</h3>
 
