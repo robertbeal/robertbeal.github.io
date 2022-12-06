@@ -7,6 +7,14 @@ modified_time: "2019-09-01T11:59:00.000+01:00"
 ---
 
 <p>
+  Deprecated - this method, while still interesting in make-up, isn't our favoured
+  method (as it has added complexitt and moving parts). There is a simpler solution using 
+  an AWS AMI base image + the awscli (SSM) to 
+  open a tunnel via a short-lived SSH key and random port. Or even simpler, directly
+  using SSM and removing the need for SSH.
+</p>
+
+<p>
   As part of our never-ending pursuit of staying secure, we have recently built
   an SSH jumpbox as a central, secure way to access our production instances on
   AWS. A fairly standard affair, although in this instance we solved the problem
