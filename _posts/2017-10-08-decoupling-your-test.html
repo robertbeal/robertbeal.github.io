@@ -51,8 +51,7 @@ modified_time: "2017-10-08T11:59:00.000+01:00"
 
 <p>Easy! Right let's start test driving this...</p>
 
-{% highlight python %} 
-class FizzBuzz(object): 
+{% highlight python %}class FizzBuzz(object): 
   def say(self, input): 
     if input % 3 == 0: 
       return "Fizz" 
@@ -75,8 +74,7 @@ class TestFizzBuzz(unittest.TestCase):
   scenario:
 </p>
 
-{% highlight python %} 
-class FizzBuzz(object):
+{% highlight python %}class FizzBuzz(object):
     def __init__(self, number, value):
         self.number = number
         self.value = value
@@ -116,8 +114,7 @@ class TestFizzBuzz(unittest.TestCase):
   controls the scenario...
 </p>
 
-{% highlight python %} 
-class FizzBuzz(object):
+{% highlight python %}class FizzBuzz(object):
     def __init__(self, rule, value):
         self.rule = rule
         self.value = value
@@ -142,8 +139,7 @@ class TestFizzBuzz(unittest.TestCase):
   negative test case:
 </p>
 
-{% highlight python %} 
-def test_it_says_the_number_if_the_rule_does_not_apply(self):
+{% highlight python %}def test_it_says_the_number_if_the_rule_does_not_apply(self):
   word = str(uuid.uuid4()) 
   self.assertEqual(0, FizzBuzz((lambda i: False), word).say(0))
 {% endhighlight %}
@@ -164,8 +160,7 @@ def test_it_says_the_number_if_the_rule_does_not_apply(self):
   represents my configuration:
 </p>
 
-{% highlight python %} 
-class Rules(list): 
+{% highlight python %}class Rules(list): 
   def __init__(self):
     list.__init__(self) self.append(Rule((lambda i: i % 3 == 0), 'Fizz'))
     self.append(Rule((lambda i: i % 5 == 0), 'Buzz'))
