@@ -51,10 +51,19 @@ modified_time: "2017-10-08T11:59:00.000+01:00"
 
 <p>Easy! Right let's start test driving this...</p>
 
-{% highlight python %} class FizzBuzz(object): def say(self, input): if input %
-3 == 0: return "Fizz" return input class TestFizzBuzz(unittest.TestCase): def
-test_it_says_Fizz_for_numbers_divisible_by_3(self): for i in range(1, 100):
-value = i*3 self.assertEqual("Fizz", FizzBuzz().say(value)) {% endhighlight %}
+{% highlight python %} 
+class FizzBuzz(object): 
+  def say(self, input): 
+    if input % 3 == 0: 
+      return "Fizz" 
+    
+    return input 
+
+class TestFizzBuzz(unittest.TestCase): 
+  def test_it_says_Fizz_for_numbers_divisible_by_3(self): 
+    for i in range(1, 100):
+      value = i*3 self.assertEqual("Fizz", FizzBuzz().say(value)) 
+{% endhighlight %}
 
 <p>
   I've not gone overly purist, and I've jumped in at getting "Fizz" to work. A
@@ -66,13 +75,25 @@ value = i*3 self.assertEqual("Fizz", FizzBuzz().say(value)) {% endhighlight %}
   scenario:
 </p>
 
-{% highlight python %} class FizzBuzz(object): def __init__(self, number,
-value): self.number = number self.value = value def say(self, input): if input %
-self.number == 0: return self.value return input class
-TestFizzBuzz(unittest.TestCase): def
-test_it_says_if_divisible_by_a_specified_number(self): number = randint(1, 9)
-word = str(uuid.uuid4()) for i in range(1, 100): value = i*number
-self.assertEqual(word, FizzBuzz(number, word).say(value)) {% endhighlight %}
+{% highlight python %} 
+class FizzBuzz(object):
+    def __init__(self, number, value):
+        self.number = number
+        self.value = value
+
+    def say(self, input):
+        if input % self.number == 0:
+            return self.value
+        return input
+
+class TestFizzBuzz(unittest.TestCase):
+    def test_it_says_if_divisible_by_a_specified_number(self):
+        number = randint(1, 9)
+        word = str(uuid.uuid4())
+        for i in range(1, 100):
+            value = i * number
+            self.assertEqual(word, FizzBuzz(number, word).say(value))
+{% endhighlight %}
 
 <p>
   In the above I've fixed <strong>Connascence of Value</strong>, and in doing so
@@ -95,12 +116,22 @@ self.assertEqual(word, FizzBuzz(number, word).say(value)) {% endhighlight %}
   controls the scenario...
 </p>
 
-{% highlight python %} class FizzBuzz(object): def __init__(self, rule, value):
-self.rule = rule self.value = value def say(self, input): if self.rule(input):
-return self.value return input class TestFizzBuzz(unittest.TestCase): def
-test_it_says_if_the_rule_applies(self): word = str(uuid.uuid4())
-self.assertEqual(word, FizzBuzz((lambda i: True), word).say(0)) {% endhighlight
-%}
+{% highlight python %} 
+class FizzBuzz(object):
+    def __init__(self, rule, value):
+        self.rule = rule
+        self.value = value
+
+    def say(self, input):
+        if self.rule(input):
+            return self.value
+        return input
+
+class TestFizzBuzz(unittest.TestCase):
+    def test_it_says_if_the_rule_applies(self):
+        word = str(uuid.uuid4())
+        self.assertEqual(word, FizzBuzz((lambda i: True), word).say(0))
+{% endhighlight %}
 
 <p>
   In removing the <strong>Connascence of Algorithm</strong> I'm able to
@@ -111,9 +142,10 @@ self.assertEqual(word, FizzBuzz((lambda i: True), word).say(0)) {% endhighlight
   negative test case:
 </p>
 
-{% highlight python %} def
-test_it_says_the_number_if_the_rule_does_not_apply(self): word =
-str(uuid.uuid4()) self.assertEqual(0, FizzBuzz((lambda i: False), word).say(0))
+{% highlight python %} 
+def test_it_says_the_number_if_the_rule_does_not_apply(self):
+  word = str(uuid.uuid4()) 
+  self.assertEqual(0, FizzBuzz((lambda i: False), word).say(0))
 {% endhighlight %}
 
 <p>
@@ -132,9 +164,12 @@ str(uuid.uuid4()) self.assertEqual(0, FizzBuzz((lambda i: False), word).say(0))
   represents my configuration:
 </p>
 
-{% highlight python %} class Rules(list): def __init__(self):
-list.__init__(self) self.append(Rule((lambda i: i % 3 == 0), 'Fizz'))
-self.append(Rule((lambda i: i % 5 == 0), 'Buzz')) {% endhighlight %}
+{% highlight python %} 
+class Rules(list): 
+  def __init__(self):
+    list.__init__(self) self.append(Rule((lambda i: i % 3 == 0), 'Fizz'))
+    self.append(Rule((lambda i: i % 5 == 0), 'Buzz'))
+{% endhighlight %}
 
 <p>
   In terms of testing the above class, all I need to test is that a rule exists
